@@ -1,5 +1,26 @@
 package main
 
-func main() {
+import (
+	"fmt"
+	"net/http"
+	"taskREST/taskModule"
+)
 
+/*
+TODO 1.СОЗДАТЬ ЗАДАЧУ done
+TODO 2.ПОЛУЧИТЬ ИНФОРМАЦИЮ ПО ОДНОЙ ЗАДАЧЕ
+TODO 3.ПОЛУЧИТЬ ИНФОРМАЦИЮ ПО ВСЕМ ЗАДАЧАМ
+TODO 4.ПОЛУЧИТЬ СПИСОК НЕВЫПОЛНЕННЫХ ЗАДАЧ
+TODO 5.ОТМЕТИТЬ ОПРЕДЕЛЕННУЮ ЗАДАЧУ КАК ВЫПОЛНЕННУЮ
+TODO 6.УДАЛИТЬ КОНКРЕТНУЮ ЗАДАЧУ
+*/
+func main() {
+	taskModule.RegisterTaskModule()
+
+	fmt.Println("Task Module registered")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("Task Module stopped")
 }
