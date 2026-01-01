@@ -61,3 +61,17 @@ func (h TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h TaskHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	tasks := h.store.GetAll()
+
+	if err := json.NewEncoder(w).Encode(tasks); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
