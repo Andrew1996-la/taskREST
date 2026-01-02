@@ -58,3 +58,13 @@ func (s *TaskStore) SetIsDone(id uuid.UUID) {
 	task.IsDone = true
 	s.tasks[id] = task
 }
+
+func (s TaskStore) GetNotIsDone() []Task {
+	tasks := make([]Task, 0, len(s.tasks))
+	for _, task := range s.tasks {
+		if !task.IsDone {
+			tasks = append(tasks, task)
+		}
+	}
+	return tasks
+}

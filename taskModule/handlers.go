@@ -69,7 +69,13 @@ func (h TaskHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tasks := h.store.GetAll()
+	doneParam := r.URL.Query().Get("done")
+	var tasks []Task
+	if doneParam == "false" {
+		tasks = h.store.GetNotIsDone()
+	} else {
+		tasks = h.store.GetAll()
+	}
 
 	if err := json.NewEncoder(w).Encode(tasks); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
