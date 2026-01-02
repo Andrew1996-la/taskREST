@@ -38,3 +38,12 @@ func (s TaskStore) GetAll() []Task {
 
 	return tasks
 }
+
+// GetById Метод получения одной задачи
+func (s TaskStore) GetById(id uuid.UUID) Task {
+	if _, ok := s.tasks[id]; !ok {
+		fmt.Println("Task not found")
+	}
+
+	return s.tasks[id]
+}

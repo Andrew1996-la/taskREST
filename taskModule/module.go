@@ -20,4 +20,7 @@ func RegisterTaskModule() {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
+
+	http.HandleFunc("/task/id", handler.GetById)
+
 }

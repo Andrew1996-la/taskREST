@@ -3,6 +3,7 @@ package taskModule
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -71,6 +72,26 @@ func (h TaskHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	tasks := h.store.GetAll()
 
 	if err := json.NewEncoder(w).Encode(tasks); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h TaskHandler) GetById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/task/")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	task := h.store.GetById(id)
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(task); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
