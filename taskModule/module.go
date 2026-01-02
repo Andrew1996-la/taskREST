@@ -12,15 +12,24 @@ func RegisterTaskModule() {
 
 	http.HandleFunc("/task", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "POST":
+		case http.MethodPost:
 			handler.Create(w, r)
-		case "GET":
+		case http.MethodGet:
 			handler.GetAll(w, r)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
 
-	http.HandleFunc("/task/id", handler.GetById)
+	http.HandleFunc("/task/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetById(w, r)
+		case http.MethodPatch:
+			handler.SetIsDone(w, r)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	})
 
 }
