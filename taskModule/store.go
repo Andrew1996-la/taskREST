@@ -47,3 +47,14 @@ func (s TaskStore) GetById(id uuid.UUID) Task {
 
 	return s.tasks[id]
 }
+
+func (s *TaskStore) SetIsDone(id uuid.UUID) {
+	task, ok := s.tasks[id]
+	if !ok {
+		fmt.Println("Task not found")
+		return
+	}
+
+	task.IsDone = true
+	s.tasks[id] = task
+}

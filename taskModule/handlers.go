@@ -96,3 +96,19 @@ func (h TaskHandler) GetById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h TaskHandler) SetIsDone(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/task/")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	h.store.SetIsDone(id)
+	w.WriteHeader(http.StatusNoContent)
+}
