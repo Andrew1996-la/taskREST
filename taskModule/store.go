@@ -68,3 +68,7 @@ func (s TaskStore) GetNotIsDone() []Task {
 	}
 	return tasks
 }
+
+func (s *TaskStore) DeleteTaskById(id uuid.UUID) {
+	delete(s.tasks, id)
+}

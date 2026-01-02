@@ -118,3 +118,20 @@ func (h TaskHandler) SetIsDone(w http.ResponseWriter, r *http.Request) {
 	h.store.SetIsDone(id)
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h TaskHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/task/")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	h.store.DeleteTaskById(id)
+	w.WriteHeader(http.StatusNoContent)
+}

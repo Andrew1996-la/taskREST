@@ -27,6 +27,8 @@ func RegisterTaskModule() {
 			handler.GetById(w, r)
 		case http.MethodPatch:
 			handler.SetIsDone(w, r)
+		case http.MethodDelete:
+			handler.DeleteById(w, r)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
