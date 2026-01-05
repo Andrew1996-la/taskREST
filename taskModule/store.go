@@ -2,7 +2,7 @@ package taskModule
 
 import (
 	"errors"
-	"fmt"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -16,6 +16,7 @@ import (
 */
 type TaskStore struct {
 	tasks map[uuid.UUID]Task
+	mtx   sync.RWMutex
 }
 
 func NewTaskStore() *TaskStore {
@@ -26,13 +27,19 @@ func NewTaskStore() *TaskStore {
 
 // Create Метод добавления новой задачи в мапу
 func (s *TaskStore) Create(task Task) {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
 	s.tasks[task.Id] = task
 }
 
 // GetAll Метод получения всех задач
 func (s TaskStore) GetAll() []Task {
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+
 	tasks := make([]Task, 0, len(s.tasks))
-	fmt.Println(tasks)
+
 	for _, task := range s.tasks {
 		tasks = append(tasks, task)
 	}
@@ -42,6 +49,9 @@ func (s TaskStore) GetAll() []Task {
 
 // GetById Метод получения одной задачи
 func (s TaskStore) GetById(id uuid.UUID) (Task, error) {
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+
 	if _, ok := s.tasks[id]; !ok {
 		return Task{}, errors.New("task not found")
 	}
@@ -50,6 +60,9 @@ func (s TaskStore) GetById(id uuid.UUID) (Task, error) {
 }
 
 func (s *TaskStore) Complete(id uuid.UUID) error {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
 	task, ok := s.tasks[id]
 	if !ok {
 		return errors.New("task not found")
@@ -61,6 +74,9 @@ func (s *TaskStore) Complete(id uuid.UUID) error {
 }
 
 func (s *TaskStore) Uncomplete(id uuid.UUID) error {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
 	task, ok := s.tasks[id]
 	if !ok {
 		return errors.New("task not found")
@@ -71,7 +87,10 @@ func (s *TaskStore) Uncomplete(id uuid.UUID) error {
 	return nil
 }
 
-func (s TaskStore) GetNotIsDone() []Task {
+func (s TaskStore) GetUncompleted() []Task {
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+
 	tasks := make([]Task, 0, len(s.tasks))
 	for _, task := range s.tasks {
 		if !task.IsDone {
@@ -82,6 +101,9 @@ func (s TaskStore) GetNotIsDone() []Task {
 }
 
 func (s *TaskStore) DeleteTaskById(id uuid.UUID) error {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
 	if _, ok := s.tasks[id]; !ok {
 		return errors.New("task not found")
 	}

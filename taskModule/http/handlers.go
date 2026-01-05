@@ -81,7 +81,7 @@ func (h httpHandlers) GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h httpHandlers) GetUncompleted(w http.ResponseWriter, r *http.Request) {
-	uncompletedTask := h.taskStore.GetNotIsDone()
+	uncompletedTask := h.taskStore.GetUncompleted()
 
 	w.Header().Set("Content-Type", "application/json")
 
