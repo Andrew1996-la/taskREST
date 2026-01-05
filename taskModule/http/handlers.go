@@ -125,31 +125,35 @@ func (h httpHandlers) Complete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	idStr := mux.Vars(r)["id"]
-	id, err := uuid.Parse(idStr)
-	if err != nil {
+	id, errParse := uuid.Parse(idStr)
+	if errParse != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
+	var (
+		task taskModule.Task
+		err  error
+	)
+
 	if completeDto.IsDone {
-		if err := h.taskStore.Complete(id); err != nil {
-			errDto := ErrorDto{
-				Message: err.Error(),
-			}
-			http.Error(w, errDto.Message, http.StatusBadRequest)
-			return
-		}
+		task, err = h.taskStore.Complete(id)
 	} else {
-		if err := h.taskStore.Uncomplete(id); err != nil {
-			errDto := ErrorDto{
-				Message: err.Error(),
-			}
-			http.Error(w, errDto.Message, http.StatusBadRequest)
-			return
-		}
+		task, err = h.taskStore.Uncomplete(id)
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	if err != nil {
+		errDto := ErrorDto{
+			Message: err.Error(),
+		}
+		http.Error(w, errDto.Message, http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h httpHandlers) DeleteById(w http.ResponseWriter, r *http.Request) {

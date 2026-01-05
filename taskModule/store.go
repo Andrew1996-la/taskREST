@@ -59,32 +59,32 @@ func (s TaskStore) GetById(id uuid.UUID) (Task, error) {
 	return s.tasks[id], nil
 }
 
-func (s *TaskStore) Complete(id uuid.UUID) error {
+func (s *TaskStore) Complete(id uuid.UUID) (Task, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
 	task, ok := s.tasks[id]
 	if !ok {
-		return errors.New("task not found")
+		return Task{}, errors.New("task not found")
 	}
 
 	task.IsDone = true
 	s.tasks[id] = task
-	return nil
+	return s.tasks[id], nil
 }
 
-func (s *TaskStore) Uncomplete(id uuid.UUID) error {
+func (s *TaskStore) Uncomplete(id uuid.UUID) (Task, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
 	task, ok := s.tasks[id]
 	if !ok {
-		return errors.New("task not found")
+		return Task{}, errors.New("task not found")
 	}
 
 	task.IsDone = false
 	s.tasks[id] = task
-	return nil
+	return s.tasks[id], nil
 }
 
 func (s TaskStore) GetUncompleted() []Task {
