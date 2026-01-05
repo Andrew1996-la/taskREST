@@ -1,6 +1,7 @@
 package taskModule
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -40,23 +41,34 @@ func (s TaskStore) GetAll() []Task {
 }
 
 // GetById Метод получения одной задачи
-func (s TaskStore) GetById(id uuid.UUID) Task {
+func (s TaskStore) GetById(id uuid.UUID) (Task, error) {
 	if _, ok := s.tasks[id]; !ok {
-		fmt.Println("Task not found")
+		return Task{}, errors.New("task not found")
 	}
 
-	return s.tasks[id]
+	return s.tasks[id], nil
 }
 
-func (s *TaskStore) SetIsDone(id uuid.UUID) {
+func (s *TaskStore) Complete(id uuid.UUID) error {
 	task, ok := s.tasks[id]
 	if !ok {
-		fmt.Println("Task not found")
-		return
+		return errors.New("task not found")
 	}
 
 	task.IsDone = true
 	s.tasks[id] = task
+	return nil
+}
+
+func (s *TaskStore) Uncomplete(id uuid.UUID) error {
+	task, ok := s.tasks[id]
+	if !ok {
+		return errors.New("task not found")
+	}
+
+	task.IsDone = false
+	s.tasks[id] = task
+	return nil
 }
 
 func (s TaskStore) GetNotIsDone() []Task {
@@ -69,6 +81,11 @@ func (s TaskStore) GetNotIsDone() []Task {
 	return tasks
 }
 
-func (s *TaskStore) DeleteTaskById(id uuid.UUID) {
+func (s *TaskStore) DeleteTaskById(id uuid.UUID) error {
+	if _, ok := s.tasks[id]; !ok {
+		return errors.New("task not found")
+	}
+
 	delete(s.tasks, id)
+	return nil
 }

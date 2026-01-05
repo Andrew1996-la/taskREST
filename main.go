@@ -2,17 +2,16 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"taskREST/taskModule"
+	"taskREST/taskModule/http"
 )
 
 func main() {
-	taskModule.RegisterTaskModule()
+	taskStore := taskModule.NewTaskStore()
+	handlers := http.NewTaskHandler(taskStore)
+	server := http.NewHTTPServer(handlers)
 
-	fmt.Println("Task Module registered")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Println(err)
+	if err := server.StartServer(); err != nil {
+		fmt.Println("Error starting server:", err)
 	}
-
-	fmt.Println("Task Module stopped")
 }
